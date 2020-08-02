@@ -27,8 +27,10 @@ class BeerSong
 
   def verse_take_one_down(num)
     first_half =  "Take one down and pass it around, "
-    if num == 0
+    if num < 0
       "Go to the store and buy some more, 99 bottles of beer on the wall.\n"
+    elsif num == 0
+      "Take it down and pass it around, no more bottles of beer on the wall.\n"
     elsif num == 1
       first_half + "1 bottle of beer on the wall.\n"
     else
@@ -36,20 +38,36 @@ class BeerSong
     end
   end
 
-  def verse(number)
+  def basic_verse_flow(number)
     verse_bottles(number) + verse_take_one_down(number - 1)
   end
 
+  def verse(number)
+    basic_verse_flow(number)
+  end
+
+  def multiple_line_sequence(text, number)
+    if text.empty?
+      text << basic_verse_flow(number)
+    else
+      text << ("\n" + basic_verse_flow(number))
+    end
+  end
+
   def verses(start_num, end_num)
-   start_num.downto(end_num) do |num|
-     verse_bottles(num) + verse_take_one_down(num - 1)
-   end
+    text = ''
+    start_num.downto(end_num) do |number|
+      multiple_line_sequence(text, number)
+    end
+    text
   end
 
   def lyrics
-    99.downto(0) do |num|
-      verse_bottles(num) + verse_take_one_down(num - 1)
+    text = ''
+    99.downto(0) do |number|
+      multiple_line_sequence(text, number)
     end
+    text
   end
 end
 
@@ -93,7 +111,7 @@ class BeerSongTest < Minitest::Test
   end
 
   def test_a_couple_verses
-    skip
+    # skip
     expected = "99 bottles of beer on the wall, 99 bottles of beer.\n" \
       "Take one down and pass it around, 98 bottles of beer on the wall.\n" \
       "\n" \
@@ -103,7 +121,7 @@ class BeerSongTest < Minitest::Test
   end
 
   def test_a_few_verses
-    skip
+    # skip
     expected = "2 bottles of beer on the wall, 2 bottles of beer.\n" \
       "Take one down and pass it around, 1 bottle of beer on the wall.\n" \
       "\n" \
@@ -116,7 +134,7 @@ class BeerSongTest < Minitest::Test
   end
 
     def test_the_whole_song # rubocop:disable Metrics/MethodLength
-    skip
+    # skip
     expected = <<-SONG
 99 bottles of beer on the wall, 99 bottles of beer.
 Take one down and pass it around, 98 bottles of beer on the wall.
