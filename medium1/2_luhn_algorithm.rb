@@ -58,6 +58,7 @@ class Luhn
       return new_number.number if new_number.valid?
       new_number.slice!
     end
+    new_number.number
   end
 
   attr_reader :number
