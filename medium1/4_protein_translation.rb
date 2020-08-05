@@ -23,7 +23,7 @@ class Translation
     when :AUG	then 'Methionine'
     when :UUU, :UUC	then 'Phenylalanine'
     when :UUA, :UUG	then 'Leucine'
-    when :UCU, :UCC, :UCA, :UCG then	'Serine'
+    when :UCU, :UCC, :UCA, :UCG then 'Serine'
     when :UAU, :UAC	then 'Tyrosine'
     when :UGU, :UGC	then 'Cysteine'
     when :UGG	then 'Tryptophan'
