@@ -1,18 +1,3 @@
-=begin
-Input: string
-Output: encoded string
-Rules: find size of square based on amount of characters. only downcased alphanumeric letters.
-Problem: remove all nonalphanumeric characters. find "row size" and either make sections of letters based on row size or iterate over the row and every "row size" character add to new string to add to array, stopping when hit the end. based on index.
-row size: find square root of the total length and round up.
-Algo: 
-Crypto class that has one class variable, string
-normalize_plaintext method called on object
-size method called on object
-plaintext_segments that breaks string apart into x-sized segments (returns array)
-ciphertext method finds new string without spaces
-normalize_ciphertext adds spaces, dynamically checking after each space what the remaining size is, and if it's divisible evenly by the remaining number of characters, change the length of the line to match the size / remaining number of lines
-=end
-
 class Crypto
   def initialize(string)
     @string = string
@@ -39,7 +24,6 @@ class Crypto
         break if array.empty?
       end
       segments << string
-      string = ''
       counter = 0
     end
     segments
@@ -61,42 +45,25 @@ class Crypto
     @new_words.join
   end
 
-  def normalize_ciphertext
-    word_size = (normalize_plaintext.size / size).ceil
-    number_of_lines = (normalize_plaintext.size / word_size).ceil
-    # iterate over numbers from number_of_lines down to 1 (returns first integer)
-    # for first element, add to results array word_size amount of characters sliced off front of old_text plus a space
-    # in next and further iterations, check at each point to see if the size of the remaining characters in old_text is evenly divisible by the current integer
-      # if so, change word size to that new divisor
-      # slice off word size and again add to results
-    # if the number is 1, add rest of letters to results
-    # join results array
-    results = []
-    old_text = ciphertext
-    number_of_lines.downto(1) do |line|
-      if line == 1
-        results.push(old_text)
-      elsif line > 1
-        word_size = old_text/number_of_lines if old_text % number_of_lines == 0
-        results.push(old_text.slice!(0..(word_size - 1)))
-      end
-    end
-        
-    results.join(' ')
+  def remove_front_letters(arr, text, word_size)
+    arr.push(text.slice!(0..(word_size - 1)))
   end
 
-    # new_text = ''
-    # old_text = ciphertext
-    # old_text.chars.each.with_index do |_, idx|
-    #   if old_text
-    #     if (idx+1) % word_size == 0 && idx != ciphertext.size - 1
-    #       new_text << old_text.slice!(0) + ' '
-    #     else
-    #       new_text << old_text.slice!(0)
-    #     end
-    #   # else
-    #   end
+  def create_words_array(word_size, number_of_lines)
+    arr = []
+    text = ciphertext
+    number_of_lines.downto(1) do |line|
+      word_size = text.size / line if text.size % line == 0
+      line == 1 ? arr.push(text) : remove_front_letters(arr, text, word_size)
+    end
+    arr
+  end
 
+  def normalize_ciphertext
+    word_size = (normalize_plaintext.size.to_f / size).ceil
+    number_of_lines = (normalize_plaintext.size.to_f / word_size).ceil
+    create_words_array(word_size, number_of_lines).join(' ')
+  end
 end
 
 require 'minitest/autorun'
@@ -185,21 +152,21 @@ class CryptoTest < Minitest::Test
   def test_another_normalized_ciphertext
     # skip
     crypto = Crypto.new(
-      'If man was meant to stay on the ground god would have given us roots',
+      'If man was meant to stay on the ground god would have given us roots'
     )
     expected = 'imtgdvs fearwer mayoogo anouuio ntnnlvt wttddes aohghn sseoau'
     assert_equal expected, crypto.normalize_ciphertext
   end
 
   def test_normalized_ciphertext_with_punctuation
-    skip
+    # skip
     crypto = Crypto.new('Have a nice day. Feed the dog & chill out!')
     expected = 'hifei acedl veeol eddgo aatcu nyhht'
     assert_equal expected, crypto.normalize_ciphertext
   end
 
   def test_normalized_ciphertext_when_just_less_then_a_full_square
-    skip
+    # skip
     crypto = Crypto.new('I am')
     assert_equal 'im a', crypto.normalize_ciphertext
   end
