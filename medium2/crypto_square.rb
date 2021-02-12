@@ -49,20 +49,30 @@ class Crypto
     arr.push(text.slice!(0..(word_size - 1)))
   end
 
-  def create_words_array(word_size, number_of_lines)
+  def calculate_word_size
+    (normalize_plaintext.size.to_f / size).ceil
+  end
+
+  def calculate_number_of_lines(word_size)
+    (normalize_plaintext.size.to_f / word_size).ceil
+  end
+
+  def create_words_array
     arr = []
     text = ciphertext
+    word_size = calculate_word_size
+    number_of_lines = calculate_number_of_lines(word_size)
+
     number_of_lines.downto(1) do |line|
       word_size = text.size / line if text.size % line == 0
       line == 1 ? arr.push(text) : remove_front_letters(arr, text, word_size)
     end
+
     arr
   end
 
   def normalize_ciphertext
-    word_size = (normalize_plaintext.size.to_f / size).ceil
-    number_of_lines = (normalize_plaintext.size.to_f / word_size).ceil
-    create_words_array(word_size, number_of_lines).join(' ')
+    create_words_array.join(' ')
   end
 end
 
